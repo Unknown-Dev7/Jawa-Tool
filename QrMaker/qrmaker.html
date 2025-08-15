@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QrCode Maker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QrCode</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
 
   <main>
     <div class="konten">
-      <h2>📷 Pembuat QR Code</h2>
+      <h2>Pembuat QR Code</h2>
 
       <label for="qrType">Jenis QR</label>
       <select id="qrType">
@@ -31,18 +31,18 @@
         <img id="logoPreview" style="max-width:100px; border-radius:8px; border:1px solid #ccc;">
       </div>
 
-      <button onclick="generateQR()">🚀 Buat QR</button>
+      <button id="generateBtn">🚀 Buat QR</button>
 
-      <div id="qrcode" style="margin-top: 20px;"></div>
+      <canvas id="qrCanvas" style="margin-top:20px; display:none;"></canvas>
       <a id="downloadBtn" style="display:none;" download="qrcode.png">Download QR</a>
     </div>
   </main>
 
   <footer>
-    jawatool.my.id - FranzIreng ©
+    JawaTool - Franz Ireng
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
