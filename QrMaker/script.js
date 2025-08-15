@@ -1,93 +1,79 @@
-// Preview logo sebelum generate
-document.getElementById("logoInput").addEventListener("change", function() {
+const logoInput = document.getElementById("logoInput");
+const logoPreview = document.getElementById("logoPreview");
+const logoPreviewContainer = document.getElementById("logoPreviewContainer");
+const generateBtn = document.getElementById("generateBtn");
+const qrCanvas = document.getElementById("qrCanvas");
+const downloadBtn = document.getElementById("downloadBtn");
+
+// Preview logo
+logoInput.addEventListener("change", function() {
   const file = this.files[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById("logoPreview").src = e.target.result;
-      document.getElementById("logoPreviewContainer").style.display = "block";
+    reader.onload = e => {
+      logoPreview.src = e.target.result;
+      logoPreviewContainer.style.display = "block";
     };
     reader.readAsDataURL(file);
   } else {
-    document.getElementById("logoPreviewContainer").style.display = "none";
+    logoPreviewContainer.style.display = "none";
   }
 });
 
-function generateQR() {
+generateBtn.addEventListener("click", function() {
   const qrType = document.getElementById("qrType").value;
-  const qrInput = document.getElementById("qrInput").value.trim();
-  const logoFile = document.getElementById("logoInput").files[0];
-  const qrContainer = document.getElementById("qrcode");
-  const downloadBtn = document.getElementById("downloadBtn");
+  let qrInput = document.getElementById("qrInput").value.trim();
 
   if (qrInput === "") {
-    alert("⚠️ Masukkan teks atau link terlebih dahulu!");
+    alert("Masukkan teks atau link terlebih dahulu Ndeng Gendeng!");
     return;
   }
 
-  qrContainer.innerHTML = "";
-  downloadBtn.style.display = "none";
-
-  let qrData = qrInput;
   if (qrType === "link" && !qrInput.startsWith("http")) {
-    qrData = "https://" + qrInput;
+    qrInput = "https://" + qrInput;
   }
 
-  // Generate QR sementara
-  const tempDiv = document.createElement("div");
-  new QRCode(tempDiv, {
-    text: qrData,
-    width: 300,
-    height: 300,
-    colorDark: "#000000",
-    colorLight: "#ffffff"
+  const qrSize = 300;
+  qrCanvas.width = qrSize;
+  qrCanvas.height = qrSize;
+  const ctx = qrCanvas.getContext("2d");
+
+  // Buat QR pakai qrious
+  const qr = new QRious({
+    value: qrInput,
+    size: qrSize,
+    level: 'H'
   });
 
-  setTimeout(() => {
-    const qrImg = tempDiv.querySelector("img");
-    if (!qrImg) return;
+  // Gambar QR ke canvas
+  ctx.drawImage(qr.image, 0, 0, qrSize, qrSize);
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const size = 300;
-    canvas.width = size;
-    canvas.height = size;
+  // Tempel logo jika ada
+  if (logoInput.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const logo = new Image();
+      logo.src = e.target.result;
+      logo.onload = () => {
+        const logoSize = qrSize * 0.25;
+        const x = (qrSize - logoSize) / 2;
+        const y = (qrSize - logoSize) / 2;
 
-    const qrImage = new Image();
-    qrImage.src = qrImg.src;
-    qrImage.onload = () => {
-      ctx.drawImage(qrImage, 0, 0, size, size);
+        ctx.fillStyle = "white";
+        ctx.fillRect(x, y, logoSize, logoSize);
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
 
-      if (logoFile) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const logo = new Image();
-          logo.src = e.target.result;
-          logo.onload = () => {
-            const logoSize = size * 0.25;
-            const x = (size - logoSize) / 2;
-            const y = (size - logoSize) / 2;
-
-            ctx.fillStyle = "white";
-            ctx.fillRect(x, y, logoSize, logoSize); 
-            ctx.drawImage(logo, x, y, logoSize, logoSize);
-
-            showFinalQR(canvas, qrContainer, downloadBtn);
-          };
-        };
-        reader.readAsDataURL(logoFile);
-      } else {
-        showFinalQR(canvas, qrContainer, downloadBtn);
-      }
+        showQR();
+      };
     };
-  }, 300);
-}
+    reader.readAsDataURL(logoInput.files[0]);
+  } else {
+    showQR();
+  }
+});
 
-function showFinalQR(canvas, container, btn) {
-  container.innerHTML = "";
-  const finalImg = new Image();
-  finalImg.src = canvas.toDataURL("image/png");
-  container.appendChild(finalImg);
-  btn.href = finalImg.src;
-  btn.style.display = "inline-block";
+function showQR() {
+  qrCanvas.style.display = "block";
+  downloadBtn.style.display = "inline-block";
+  downloadBtn.href = qrCanvas.toDataURL("image/png");
 }
